@@ -109,23 +109,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const emailError = validateEmail(email);
     if (emailError) return { success: false, error: emailError };
 
+    // Step 1: Create auth account
+    let cred;
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, 'users', cred.user.uid), { username, email });
-      await sendEmailVerification(cred.user);
-      setFirebaseUser(cred.user);
-      await signOut(auth);
-      return { success: true };
+    cred = await createUserWithEmailAndPassword(auth, email, password);
     } catch (err: unknown) {
-      const code = (err as { code?: string }).code;
-      if (code === 'auth/email-already-in-use') {
+    console.error("Firebase register error:", err);
+
+    const code = (err as { code?: string }).code;
+    const message = (err as { message?: string }).message;
+
+    if (code === 'auth/email-already-in-use') {
         return { success: false, error: 'An account with this email already exists.' };
-      }
-      if (code === 'auth/weak-password') {
-        return { success: false, error: 'Password must be at least 6 characters.' };
-      }
-      return { success: false, error: 'Registration failed. Please try again.' };
     }
+
+    if (code === 'auth/weak-password') {
+        return { success: false, error: 'Password must be at least 6 characters.' };
+    }
+
+    if (code === 'auth/operation-not-allowed') {
+        return { success: false, error: 'Email/Password sign-in is not enabled.' };
+    }
+
+    return { success: false, error: code ?? message ?? 'Unknown error' };
+    }
+
+    // Step 2: Save username to Firestore (non-blocking — won't prevent registration)
+    try {
+      await setDoc(doc(db, 'users', cred.user.uid), { username, email });
+    } catch (err: unknown) {
+      console.warn('Firestore write failed (username not saved):', (err as { message?: string }).message);
+    }
+
+    // Step 3: Send verification email
+    try {
+      await sendEmailVerification(cred.user);
+    } catch (err: unknown) {
+      console.warn('Verification email failed:', (err as { message?: string }).message);
+    }
+
+    setFirebaseUser(cred.user);
+    await signOut(auth);
+    return { success: true };
   };
 
   const resendVerification = async (): Promise<{ success: boolean; error?: string }> => {
