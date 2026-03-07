@@ -1,10 +1,8 @@
 'use client';
 
-import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { 
   Wind, 
-  LogOut, 
   Droplets, 
   Thermometer, 
   Cloud, 
@@ -91,15 +89,9 @@ function generateSensorData(): SensorData[] {
 }
 
 export default function Dashboard() {
-  const { logout, user } = useAuth();
   const router = useRouter();
   const [sensorData, setSensorData] = useState<SensorData[]>(generateSensorData);
   const [currentTime, setCurrentTime] = useState(new Date());
-
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
 
   // Simulate real-time sensor data updates
   useEffect(() => {
@@ -168,18 +160,10 @@ export default function Dashboard() {
 
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm text-white">{user?.username}</p>
                   <p className="text-xs text-gray-400">
                     {currentTime.toLocaleTimeString()}
                   </p>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all duration-200 border border-red-500/30"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline">Logout</span>
-                </button>
               </div>
             </div>
           </div>
