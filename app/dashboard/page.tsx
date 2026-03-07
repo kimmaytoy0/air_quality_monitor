@@ -1,4 +1,6 @@
 'use client';
+import { ref, onValue } from "firebase/database";
+import { database } from "@/lib/firebase";
 
 import { useRouter } from 'next/navigation';
 import { 
@@ -22,94 +24,82 @@ interface SensorData {
   trend: number;
 }
 
-function generateSensorData(): SensorData[] {
-  const pm25 = Math.floor(Math.random() * 50) + 10;
-  const pm10 = Math.floor(Math.random() * 80) + 20;
-  const co2 = Math.floor(Math.random() * 600) + 400;
-  const temp = Math.floor(Math.random() * 10) + 20;
-  const humidity = Math.floor(Math.random() * 30) + 40;
-  const aqi = Math.floor((pm25 + pm10) / 2);
-
-  return [
-    {
-      id: 'pm25',
-      label: 'PM2.5',
-      value: pm25,
-      unit: 'μg/m³',
-      status: pm25 < 25 ? 'good' : pm25 < 50 ? 'moderate' : 'poor',
-      icon: Wind,
-      trend: Math.random() > 0.5 ? Math.random() * 5 : -Math.random() * 5
-    },
-    {
-      id: 'pm10',
-      label: 'PM10',
-      value: pm10,
-      unit: 'μg/m³',
-      status: pm10 < 50 ? 'good' : pm10 < 100 ? 'moderate' : 'poor',
-      icon: Cloud,
-      trend: Math.random() > 0.5 ? Math.random() * 5 : -Math.random() * 5
-    },
-    {
-      id: 'co2',
-      label: 'CO₂',
-      value: co2,
-      unit: 'ppm',
-      status: co2 < 800 ? 'good' : co2 < 1000 ? 'moderate' : 'poor',
-      icon: Activity,
-      trend: Math.random() > 0.5 ? Math.random() * 5 : -Math.random() * 5
-    },
-    {
-      id: 'aqi',
-      label: 'AQI',
-      value: aqi,
-      unit: 'index',
-      status: aqi < 50 ? 'good' : aqi < 100 ? 'moderate' : 'poor',
-      icon: AlertCircle,
-      trend: Math.random() > 0.5 ? Math.random() * 5 : -Math.random() * 5
-    },
-    {
-      id: 'temp',
-      label: 'Temperature',
-      value: temp,
-      unit: '°C',
-      status: 'good',
-      icon: Thermometer,
-      trend: Math.random() > 0.5 ? Math.random() * 2 : -Math.random() * 2
-    },
-    {
-      id: 'humidity',
-      label: 'Humidity',
-      value: humidity,
-      unit: '%',
-      status: humidity > 30 && humidity < 60 ? 'good' : 'moderate',
-      icon: Droplets,
-      trend: Math.random() > 0.5 ? Math.random() * 3 : -Math.random() * 3
-    }
-  ];
-}
 
 export default function Dashboard() {
   const router = useRouter();
-  const [sensorData, setSensorData] = useState<SensorData[]>(generateSensorData);
+  const [sensorData, setSensorData] = useState<SensorData[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Simulate real-time sensor data updates
   useEffect(() => {
-    // Update sensor data every 3 seconds
-    const dataInterval = setInterval(() => {
-      setSensorData(generateSensorData());
-    }, 3000);
 
-    // Update time every second
-    const timeInterval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+  const sensorRef = ref(database, "air_monitor");
 
-    return () => {
-      clearInterval(dataInterval);
-      clearInterval(timeInterval);
-    };
-  }, []);
+  const unsubscribe = onValue(sensorRef, (snapshot) => {
+
+    const data = snapshot.val();
+
+    if (!data) return;
+
+    const pm25 = data.pm25 ?? 0;
+    const pm10 = data.pm10 ?? 0;
+    const co2 = data.co2 ?? 0;
+    const temp = data.temperature ?? 0;
+    const humidity = data.humidity ?? 0;
+
+    const aqi = Math.floor((pm25 + pm10) / 2);
+
+    const sensors: SensorData[] = [
+
+  {
+    id: 'air',
+    label: 'Air Quality',
+    value: data.air_quality ?? 0,
+    unit: 'ppm',
+    status: data.air_quality < 200 ? 'good' : data.air_quality < 400 ? 'moderate' : 'poor',
+    icon: Wind,
+    trend: 0
+  },
+
+  {
+    id: 'aqi',
+    label: 'AQI',
+    value: data.air_quality ?? 0,
+    unit: 'index',
+    status: data.air_quality < 200 ? 'good' : data.air_quality < 400 ? 'moderate' : 'poor',
+    icon: AlertCircle,
+    trend: 0
+  },
+
+  {
+    id: 'temp',
+    label: 'Temperature',
+    value: data.temperature ?? 0,
+    unit: '°C',
+    status: 'good',
+    icon: Thermometer,
+    trend: 0
+  },
+
+  {
+    id: 'pressure',
+    label: 'Pressure',
+    value: data.pressure ?? 0,
+    unit: 'hPa',
+    status: 'good',
+    icon: Cloud,
+    trend: 0
+  }
+
+];
+
+    setSensorData(sensors);
+
+  });
+
+  return () => unsubscribe();
+
+}, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
