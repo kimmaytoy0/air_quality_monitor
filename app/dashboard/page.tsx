@@ -75,50 +75,56 @@ export default function Dashboard() {
   ---------------------------- */
   useEffect(() => {
 
-    const sensorRef = ref(database, "air_monitor");
+  const sensorRef = ref(database, "air_monitor");
 
-    const unsubscribe = onValue(sensorRef, (snapshot) => {
+  const unsubscribe = onValue(sensorRef, (snapshot) => {
 
-      const data = snapshot.val();
-      if (!data) return;
+    const data = snapshot.val();
 
-      const sensors: SensorData[] = [
-        {
-          id: 'air',
-          label: 'Air Quality',
-          value: Number(data.air_quality ?? 0),
-          unit: 'ppm',
-          status: data.air_quality < 200 ? 'good' : data.air_quality < 400 ? 'moderate' : 'poor',
-          icon: Wind,
-          trend: 0
-        },
-        {
-          id: 'temp',
-          label: 'Temperature',
-          value: Number(data.temperature ?? 0),
-          unit: '°C',
-          status: 'good',
-          icon: Thermometer,
-          trend: 0
-        },
-        {
-          id: 'pressure',
-          label: 'Pressure',
-          value: Number(data.pressure ?? 0),
-          unit: 'hPa',
-          status: 'good',
-          icon: Cloud,
-          trend: 0
-        }
-      ];
+    console.log("Firebase data:", data); // DEBUG
 
-      setSensorData(sensors);
+    if (!data) return;
 
-    });
+    setSensorData([
+      {
+        id: "air",
+        label: "Air Quality",
+        value: Number(data.air_quality),
+        unit: "ppm",
+        status:
+          data.air_quality < 200
+            ? "good"
+            : data.air_quality < 400
+            ? "moderate"
+            : "poor",
+        icon: Wind,
+        trend: 0
+      },
+      {
+        id: "temp",
+        label: "Temperature",
+        value: Number(data.temperature),
+        unit: "°C",
+        status: "good",
+        icon: Thermometer,
+        trend: 0
+      },
+      {
+        id: "pressure",
+        label: "Pressure",
+        value: Number(data.pressure),
+        unit: "hPa",
+        status: "good",
+        icon: Cloud,
+        trend: 0
+      }
+    ]);
 
-    return () => unsubscribe();
+  });
 
-  }, []);
+  return () => unsubscribe();
+
+}, []);
 
   /* ---------------------------
      STATUS COLORS
