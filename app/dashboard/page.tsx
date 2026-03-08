@@ -7,6 +7,7 @@ import {
   Wind, 
   Thermometer, 
   Cloud, 
+  Droplets,
   AlertCircle,
   TrendingUp
 } from 'lucide-react';
@@ -51,6 +52,24 @@ export default function Dashboard() {
       unit: "hPa",
       status: "good",
       icon: Cloud,
+      trend: 0
+    },
+    {
+      id: "humidity",
+      label: "Humidity",
+      value: 0,
+      unit: "%",
+      status: "good",
+      icon: Droplets,
+      trend: 0
+    },
+    {
+      id: "dust",
+      label: "Dust",
+      value: 0,
+      unit: "µg/m³",
+      status: "good",
+      icon: Wind,
       trend: 0
     }
   ]);
@@ -116,6 +135,34 @@ export default function Dashboard() {
         unit: "hPa",
         status: "good",
         icon: Cloud,
+        trend: 0
+      },
+      {
+        id: "humidity",
+        label: "Humidity",
+        value: Number(data.humidity),
+        unit: "%",
+        status:
+          data.humidity < 60
+            ? "good"
+            : data.humidity < 80
+            ? "moderate"
+            : "poor",
+        icon: Droplets,
+        trend: 0
+      },
+      {
+        id: "dust",
+        label: "Dust",
+        value: Number(data.dust),
+        unit: "µg/m³",
+        status:
+          data.dust < 50
+            ? "good"
+            : data.dust < 100
+            ? "moderate"
+            : "poor",
+        icon: Wind,
         trend: 0
       }
     ]);
