@@ -181,6 +181,20 @@ export default function Dashboard() {
 
   };
 
+  const overallStatus = (() => {
+    if (sensorData.length === 0) return null;
+    const statuses = sensorData.map(s => s.status);
+    if (statuses.includes('poor')) return 'poor';
+    if (statuses.includes('moderate')) return 'moderate';
+    return 'good';
+  })();
+
+  const overallLabel: Record<string, { text: string; color: string }> = {
+    good: { text: 'Good', color: 'bg-green-500/20 text-green-400 border-green-500/40' },
+    moderate: { text: 'Moderate', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40' },
+    poor: { text: 'Poor', color: 'bg-red-500/20 text-red-400 border-red-500/40' },
+  };
+
   return (
 
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#1a0a1f] to-[#0f0a1a]">
@@ -211,9 +225,19 @@ export default function Dashboard() {
 
             </div>
 
-            <p className="text-xs text-gray-400">
-              {currentTime}
-            </p>
+            <div className="flex items-center gap-4">
+
+              {overallStatus && (
+                <div className={`px-4 py-1.5 rounded-full border text-sm font-semibold ${overallLabel[overallStatus].color}`}>
+                  Overall: {overallLabel[overallStatus].text}
+                </div>
+              )}
+
+              <p className="text-xs text-gray-400">
+                {currentTime}
+              </p>
+
+            </div>
 
           </div>
 
