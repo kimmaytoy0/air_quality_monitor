@@ -18,7 +18,8 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid
+  CartesianGrid,
+  Legend
 } from "recharts";
 
 import { useEffect, useState } from "react";
@@ -271,12 +272,24 @@ export default function Dashboard() {
 
               <Tooltip />
 
+
+
+              <Line
+                type="monotone"
+                dataKey="dust"
+                stroke="#f97316"
+                strokeWidth={2}
+                dot={false}
+                name="Dust (µg/m³)"
+              />
+
               <Line
                 type="monotone"
                 dataKey="air"
                 stroke="#a855f7"
                 strokeWidth={2}
                 dot={false}
+                name="Air Quality (ppm)"
               />
 
               <Line
@@ -285,6 +298,7 @@ export default function Dashboard() {
                 stroke="#22c55e"
                 strokeWidth={2}
                 dot={false}
+                name="Temperature (°C)"
               />
 
               <Line
@@ -293,20 +307,34 @@ export default function Dashboard() {
                 stroke="#38bdf8"
                 strokeWidth={2}
                 dot={false}
+                name="Humidity (%)"
               />
 
-              <Line
-                type="monotone"
-                dataKey="dust"
-                stroke="#f97316"
-                strokeWidth={2}
-                dot={false}
-              />
+              <Legend />
 
             </LineChart>
 
           </ResponsiveContainer>
 
+        </div>
+
+
+        {/* STATUS LEGEND */}
+
+        <div className="mb-6 flex flex-wrap gap-4 items-center bg-gray-900/40 backdrop-blur-xl border border-purple-500/20 rounded-xl px-6 py-4">
+          <span className="text-sm text-gray-400 font-medium">Status:</span>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-green-500" />
+            <span className="text-sm text-green-400">Good</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-yellow-500" />
+            <span className="text-sm text-yellow-400">Moderate</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-red-500" />
+            <span className="text-sm text-red-400">Poor</span>
+          </div>
         </div>
 
 
