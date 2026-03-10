@@ -34,12 +34,18 @@ interface SensorData {
   trend: number;
 }
 
+function safeNumber(val: unknown, fallback = 0): number {
+  const num = Number(val);
+  return isNaN(num) ? fallback : num;
+}
+
 export default function Dashboard() {
 
   const [sensorData, setSensorData] = useState<SensorData[]>([]);
   const [currentTime, setCurrentTime] = useState<string>("");
-
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<{ time: string; air: number; temp: number; humidity: number; dust: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   /* ---------------------------
      REAL TIME CLOCK
@@ -68,18 +74,31 @@ export default function Dashboard() {
 
       const data = snapshot.val();
 
-      if (!data) return;
+      if (!data) {
+        setError("No sensor data available.");
+        setLoading(false);
+        return;
+      }
+
+      setError(null);
+      setLoading(false);
+
+      const airVal = safeNumber(data.air_quality);
+      const tempVal = safeNumber(data.temperature);
+      const pressureVal = safeNumber(data.pressure);
+      const humidityVal = safeNumber(data.humidity);
+      const dustVal = safeNumber(data.dust);
 
       const newSensors: SensorData[] = [
         {
           id: "air",
           label: "Air Quality",
-          value: Number(data.air_quality),
+          value: airVal,
           unit: "ppm",
           status:
-            data.air_quality < 200
+            airVal < 200
               ? "good"
-              : data.air_quality < 400
+              : airVal < 400
                 ? "moderate"
                 : "poor",
           icon: Wind,
@@ -88,7 +107,7 @@ export default function Dashboard() {
         {
           id: "temp",
           label: "Temperature",
-          value: Number(data.temperature),
+          value: tempVal,
           unit: "°C",
           status: "good",
           icon: Thermometer,
@@ -97,7 +116,7 @@ export default function Dashboard() {
         {
           id: "pressure",
           label: "Pressure",
-          value: Number(data.pressure),
+          value: pressureVal,
           unit: "hPa",
           status: "good",
           icon: Cloud,
@@ -106,12 +125,12 @@ export default function Dashboard() {
         {
           id: "humidity",
           label: "Humidity",
-          value: Number(data.humidity),
+          value: humidityVal,
           unit: "%",
           status:
-            data.humidity < 60
+            humidityVal < 60
               ? "good"
-              : data.humidity < 80
+              : humidityVal < 80
                 ? "moderate"
                 : "poor",
           icon: Droplets,
@@ -120,12 +139,12 @@ export default function Dashboard() {
         {
           id: "dust",
           label: "Dust",
-          value: Number(data.dust),
+          value: dustVal,
           unit: "µg/m³",
           status:
-            data.dust < 50
+            dustVal < 50
               ? "good"
-              : data.dust < 100
+              : dustVal < 100
                 ? "moderate"
                 : "poor",
           icon: Wind,
@@ -143,10 +162,10 @@ export default function Dashboard() {
 
         const newEntry = {
           time: now,
-          air: data.air_quality,
-          temp: data.temperature,
-          humidity: data.humidity,
-          dust: data.dust
+          air: airVal,
+          temp: tempVal,
+          humidity: humidityVal,
+          dust: dustVal
         };
 
         const updated = [...prev, newEntry];
@@ -157,6 +176,9 @@ export default function Dashboard() {
 
       });
 
+    }, (err) => {
+      setError("Failed to connect to sensor data: " + err.message);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -195,6 +217,29 @@ export default function Dashboard() {
     moderate: { text: 'Moderate', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40' },
     poor: { text: 'Poor', color: 'bg-red-500/20 text-red-400 border-red-500/40' },
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#1a0a1f] to-[#0f0a1a] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-purple-300 text-lg">Connecting to sensors...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#1a0a1f] to-[#0f0a1a] flex items-center justify-center">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-8 max-w-md text-center">
+          <div className="text-red-400 text-4xl mb-4">⚠</div>
+          <h2 className="text-xl font-bold text-red-400 mb-2">Connection Error</h2>
+          <p className="text-gray-400">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
 
