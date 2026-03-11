@@ -261,11 +261,11 @@ export default function Dashboard() {
 
               <div>
                 <h1 className="text-xl font-bold text-white">
-                  Air Quality Monitor
+                  Purify
                 </h1>
 
                 <p className="text-xs text-purple-300">
-                  Real-time environmental data
+                  Air Quality Monitor 
                 </p>
               </div>
 
