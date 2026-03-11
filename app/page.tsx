@@ -16,7 +16,8 @@ export default function LandingPage() {
 
   return (
     <main
-      className="flex items-center justify-center min-h-screen bg-black text-white overflow-hidden relative"
+      className="flex items-center justify-center min-h-screen overflow-hidden relative"
+      style={{ background: "#0a0010" }}
     >
       <style>{`
         @keyframes windStreak {
@@ -33,36 +34,44 @@ export default function LandingPage() {
         }
         @keyframes floatUp {
           0%   { transform: translateY(0px) rotate(0deg); opacity: 0; }
-          20%  { opacity: 0.6; }
+          20%  { opacity: 0.7; }
           80%  { opacity: 0.4; }
-          100% { transform: translateY(-80px) rotate(15deg); opacity: 0; }
-        }
-        @keyframes logoReveal {
-          0%   { opacity: 0; filter: blur(20px); transform: scale(0.8); }
-          60%  { filter: blur(2px); }
-          100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+          100% { transform: translateY(-90px) rotate(15deg); opacity: 0; }
         }
         @keyframes svgReveal {
-          0%   { opacity: 0; transform: translateY(10px) scale(0.95); filter: blur(6px); }
-          100% { opacity: 1; transform: translateY(0px) scale(1);    filter: blur(0px); }
+          0%   { opacity: 0; transform: translateY(14px) scale(0.92); filter: blur(10px); }
+          100% { opacity: 1; transform: translateY(0px)  scale(1);    filter: blur(0px); }
         }
         @keyframes subtitleFade {
           0%   { opacity: 0; transform: translateY(8px); }
-          100% { opacity: 0.5; transform: translateY(0); }
+          100% { opacity: 1; transform: translateY(0); }
         }
         @keyframes pulseGlow {
-          0%, 100% { box-shadow: 0 0 0px 0px rgba(130,200,255,0.0); }
-          50%       { box-shadow: 0 0 40px 8px rgba(130,200,255,0.18); }
+          0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1);   }
+          50%       { opacity: 0.7; transform: translate(-50%, -50%) scale(1.12); }
         }
         @keyframes progressBar {
           0%   { width: 0%; }
           100% { width: 100%; }
         }
+        @keyframes rotateSlow {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to   { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes rotateSlowReverse {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to   { transform: translate(-50%, -50%) rotate(-360deg); }
+        }
+        @keyframes titleReveal {
+          0%   { opacity: 0; letter-spacing: 0.6em; filter: blur(8px); }
+          100% { opacity: 1; letter-spacing: 0.3em; filter: blur(0px); }
+        }
+
         .wind-streak {
           position: absolute;
           height: 1.5px;
           border-radius: 999px;
-          background: linear-gradient(90deg, transparent, rgba(160,220,255,0.55), transparent);
+          background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.65), transparent);
           animation: windStreak linear infinite;
           will-change: transform;
         }
@@ -70,106 +79,147 @@ export default function LandingPage() {
           position: absolute;
           height: 1px;
           border-radius: 999px;
-          background: linear-gradient(90deg, transparent, rgba(200,235,255,0.4), transparent);
+          background: linear-gradient(90deg, transparent, rgba(216, 180, 254, 0.45), transparent);
           animation: windStreakFast linear infinite;
           will-change: transform;
         }
         .particle {
           position: absolute;
-          width: 3px;
-          height: 3px;
           border-radius: 50%;
-          background: rgba(160,220,255,0.5);
+          background: rgba(192, 132, 252, 0.6);
           animation: floatUp ease-in-out infinite;
         }
-        .logo-wrap    { animation: logoReveal 1.1s cubic-bezier(0.22,1,0.36,1) 0.3s both; }
-        .svg-logo     { animation: svgReveal  0.9s cubic-bezier(0.22,1,0.36,1) 1.0s both; }
-        .sub-label    { animation: subtitleFade 0.8s ease 1.6s both; }
-        .glow-ring    { animation: pulseGlow 2.8s ease-in-out 1.4s infinite; }
-        .progress     { animation: progressBar 3s linear forwards; }
+        .svg-logo    { animation: svgReveal    1.0s cubic-bezier(0.22,1,0.36,1) 0.8s both; }
+        .title-text  { animation: titleReveal  1.0s cubic-bezier(0.22,1,0.36,1) 0.4s both; }
+        .sub-label   { animation: subtitleFade 0.8s ease 1.6s both; }
+        .progress    { animation: progressBar  3s linear forwards; }
+
+        .orbit-1 {
+          position: absolute; border-radius: 50%; top: 50%; left: 50%;
+          border: 1px solid rgba(147, 51, 234, 0.25);
+          animation: rotateSlow 20s linear infinite;
+        }
+        .orbit-2 {
+          position: absolute; border-radius: 50%; top: 50%; left: 50%;
+          border: 1px solid rgba(216, 180, 254, 0.12);
+          animation: rotateSlowReverse 32s linear infinite;
+        }
+        .glow-blob {
+          position: absolute; top: 50%; left: 50%;
+          border-radius: 50%;
+          animation: pulseGlow 3.2s ease-in-out infinite;
+          pointer-events: none;
+        }
       `}</style>
 
-      {/* Background atmosphere */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 50% at 50% 60%, rgba(30,80,130,0.35) 0%, transparent 70%), " +
-            "radial-gradient(ellipse 100% 60% at 20% 50%, rgba(10,50,90,0.2) 0%, transparent 60%)",
-        }}
-      />
+      {/* ── Deep purple background atmosphere ── */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background:
+          "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(88, 28, 135, 0.55) 0%, transparent 70%), " +
+          "radial-gradient(ellipse 50% 40% at 20% 60%, rgba(107, 33, 168, 0.25) 0%, transparent 60%), " +
+          "radial-gradient(ellipse 50% 40% at 80% 35%, rgba(126, 34, 206, 0.20) 0%, transparent 60%)",
+      }} />
 
-      {/* Wind streaks — slow */}
+      {/* Vignette */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: "radial-gradient(ellipse 110% 110% at 50% 50%, transparent 35%, rgba(0,0,0,0.85) 100%)",
+      }} />
+
+      {/* ── Orbit rings ── */}
+      <div className="orbit-1" style={{ width: 280, height: 280, marginTop: -140, marginLeft: -140 }} />
+      <div className="orbit-2" style={{ width: 370, height: 370, marginTop: -185, marginLeft: -185 }} />
+
+      {/* ── Glow blob ── */}
+      <div className="glow-blob" style={{
+        width: 220, height: 220, marginTop: -110, marginLeft: -110,
+        background: "radial-gradient(circle, rgba(147,51,234,0.35) 0%, transparent 70%)",
+      }} />
+
+      {/* ── Wind streaks — slow ── */}
       {[
-        { top: "12%", width: "38%", dur: "3.4s", delay: "0s"   },
-        { top: "27%", width: "55%", dur: "2.8s", delay: "0.6s" },
-        { top: "43%", width: "45%", dur: "3.9s", delay: "1.1s" },
-        { top: "58%", width: "60%", dur: "2.6s", delay: "0.3s" },
-        { top: "72%", width: "40%", dur: "3.2s", delay: "1.5s" },
-        { top: "85%", width: "50%", dur: "2.9s", delay: "0.8s" },
+        { top: "9%",  width: "44%", dur: "3.6s", delay: "0s"   },
+        { top: "23%", width: "57%", dur: "2.9s", delay: "0.5s" },
+        { top: "39%", width: "48%", dur: "4.1s", delay: "1.0s" },
+        { top: "55%", width: "62%", dur: "2.7s", delay: "0.3s" },
+        { top: "69%", width: "39%", dur: "3.3s", delay: "1.4s" },
+        { top: "83%", width: "53%", dur: "3.0s", delay: "0.7s" },
       ].map((s, i) => (
-        <div key={`streak-${i}`} className="wind-streak"
+        <div key={`s${i}`} className="wind-streak"
           style={{ top: s.top, width: s.width, animationDuration: s.dur, animationDelay: s.delay }} />
       ))}
 
-      {/* Wind streaks — fast */}
+      {/* ── Wind streaks — fast ── */}
       {[
-        { top: "20%", width: "25%", dur: "1.8s", delay: "0.2s" },
-        { top: "35%", width: "18%", dur: "2.1s", delay: "0.9s" },
-        { top: "50%", width: "30%", dur: "1.6s", delay: "0.4s" },
-        { top: "65%", width: "22%", dur: "2.3s", delay: "1.2s" },
-        { top: "78%", width: "28%", dur: "1.9s", delay: "0.7s" },
+        { top: "17%", width: "25%", dur: "1.9s", delay: "0.2s" },
+        { top: "32%", width: "18%", dur: "2.2s", delay: "0.8s" },
+        { top: "47%", width: "31%", dur: "1.7s", delay: "0.4s" },
+        { top: "62%", width: "22%", dur: "2.4s", delay: "1.1s" },
+        { top: "76%", width: "28%", dur: "2.0s", delay: "0.6s" },
       ].map((s, i) => (
-        <div key={`fast-${i}`} className="wind-streak-fast"
+        <div key={`f${i}`} className="wind-streak-fast"
           style={{ top: s.top, width: s.width, animationDuration: s.dur, animationDelay: s.delay }} />
       ))}
 
-      {/* Floating dust particles */}
+      {/* ── Floating particles ── */}
       {[
-        { left: "15%", top: "70%", dur: "4.2s", delay: "0s"   },
-        { left: "30%", top: "65%", dur: "3.8s", delay: "0.8s" },
-        { left: "55%", top: "75%", dur: "5.0s", delay: "1.4s" },
-        { left: "70%", top: "68%", dur: "3.5s", delay: "0.3s" },
-        { left: "85%", top: "72%", dur: "4.6s", delay: "1.0s" },
-        { left: "42%", top: "80%", dur: "4.0s", delay: "0.5s" },
+        { left: "11%", top: "73%", size: 3, dur: "4.4s", delay: "0s"   },
+        { left: "27%", top: "68%", size: 2, dur: "3.9s", delay: "0.7s" },
+        { left: "51%", top: "77%", size: 4, dur: "5.2s", delay: "1.3s" },
+        { left: "67%", top: "71%", size: 2, dur: "3.6s", delay: "0.2s" },
+        { left: "82%", top: "75%", size: 3, dur: "4.7s", delay: "0.9s" },
+        { left: "39%", top: "83%", size: 2, dur: "4.1s", delay: "0.4s" },
+        { left: "59%", top: "61%", size: 3, dur: "3.3s", delay: "1.6s" },
+        { left: "75%", top: "55%", size: 2, dur: "4.8s", delay: "1.0s" },
       ].map((p, i) => (
-        <div key={`part-${i}`} className="particle"
-          style={{ left: p.left, top: p.top, animationDuration: p.dur, animationDelay: p.delay }} />
+        <div key={`p${i}`} className="particle"
+          style={{ left: p.left, top: p.top, width: p.size, height: p.size, animationDuration: p.dur, animationDelay: p.delay }} />
       ))}
 
-      {/* Centre card */}
-      <div className="relative z-10 flex flex-col items-center gap-6">
+      {/* ── Centre content ── */}
+      <div className="relative z-10 flex flex-col items-center gap-4">
 
-        {/* Pulse glow ring behind logo */}
-        <div
-          className="glow-ring absolute rounded-full pointer-events-none"
-          style={{ width: 180, height: 180, top: "50%", left: "50%", transform: "translate(-50%,-50%) translateY(-30px)" }}
-        />
-        
         {/* LOGO_AIR SVG */}
-        <div className="svg-logo">
+        <div className="svg-logo mb-1">
           <Image
-            src="/LOGO_AIR.svg"
+            src="/landing_air.svg"
             alt="LOGO_AIR"
-            width={220}
-            height={60}
-            className="mx-auto drop-shadow-[0_0_16px_rgba(130,200,255,0.45)]"
+            width={240}
+            height={70}
+            className="mx-auto"
+            style={{ filter: "drop-shadow(0 0 18px rgba(168, 85, 247, 0.7)) drop-shadow(0 0 6px rgba(216,180,254,0.5))" }}
           />
         </div>
 
-        {/* Subtitle */}
-        <p className="sub-label -mt-3 text-xs tracking-[0.35em] uppercase text-blue-200">
+        {/* App name */}
+        <h1
+          className="title-text text-xs font-semibold uppercase"
+          style={{
+            letterSpacing: "0.3em",
+            color: "rgba(216, 180, 254, 0.75)",
+          }}
+        >
           Air Quality Monitor
+        </h1>
+
+        {/* Divider */}
+        <div style={{ width: 40, height: 1, background: "rgba(147, 51, 234, 0.5)", borderRadius: 999 }} />
+
+        {/* Tagline */}
+        <p
+          className="sub-label text-xs"
+          style={{ color: "rgba(192, 132, 252, 0.5)", letterSpacing: "0.15em" }}
+        >
+          Breathe. Monitor. Purify.
         </p>
 
         {/* Progress bar */}
         <div
-          className="mt-2 rounded-full overflow-hidden"
-          style={{ width: 160, height: 2, background: "rgba(255,255,255,0.1)" }}
+          className="mt-4 rounded-full overflow-hidden"
+          style={{ width: 150, height: 2, background: "rgba(107, 33, 168, 0.3)" }}
         >
           <div
             className="progress h-full rounded-full"
-            style={{ background: "linear-gradient(90deg, #4aadff, #a8deff)" }}
+            style={{ background: "linear-gradient(90deg, #7e22ce, #c084fc)" }}
           />
         </div>
 
